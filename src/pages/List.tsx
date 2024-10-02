@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Container, Typography, Button, Box } from "@mui/material";
+import { Container, Typography, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 
 import { Horse } from "../types/definitions";
 import { getHorses } from "../services/apiServices";
 import HorseList from "../components/HorseList";
 import Details from "../components/Details";
-import Loading from "../components/Loading";
+import Loading from "../components/loading/ListSkeleton";
 import { StyledBox } from "../components/Box";
 
 export default function Horses() {
@@ -30,12 +30,27 @@ export default function Horses() {
   }, []);
 
   const handleCompare = (id: string) => {
-    setIds([...ids, id]);
+    if (!ids.includes(id)) {
+      setIds((prevIds) => [...prevIds, id]);
+    }
   };
 
   const removeCompare = (id: string) => {
     setIds((prev) => prev.filter((item) => item !== id));
   };
+
+  useEffect(() => {
+    if (ids.length > 0) {
+      const element = document.getElementById("compare-section");
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest",
+        });
+      }
+    }
+  }, [ids]);
 
   if (loading) {
     return <Loading />;
@@ -43,7 +58,7 @@ export default function Horses() {
 
   const compareHorses = horses?.filter((item) => ids.includes(item.id));
   return (
-    <Container>
+    <>
       <Container
         sx={{
           display: "flex",
@@ -52,34 +67,42 @@ export default function Horses() {
         }}
       >
         <Typography variant="h2">Current Horses:</Typography>
-        <Button variant="contained" component={Link} to={"/add"}>
+        <Button variant="contained" component={Link} to={"/horse"}>
           Add a Horse
         </Button>
       </Container>
 
       <HorseList horses={horses} handleCompare={handleCompare} ids={ids} />
 
-      {ids.length > 0 && (
-        <Container sx={{ mt: 4, mb: 1 }}>
-          <Typography variant="h3">Compare</Typography>
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-            {compareHorses.map((horse: Horse) => (
-              <StyledBox
-                key={horse.id}
-              >
-                <Details horse={horse} />
-                <Button
-                  variant="outlined"
-                  onClick={() => removeCompare(horse.id)}
-                  sx={{ m: 2 }}
-                >
-                  Remove
-                </Button>
-              </StyledBox>
-            ))}
-          </Box>
-        </Container>
-      )}
-    </Container>
+      <Container sx={{ my: 4 }} id={"compare-section"}>
+        <Typography variant="h3" gutterBottom>
+          Compare Two Horses
+        </Typography>
+        <Typography variant="h6" gutterBottom>
+          You can select two horses above, to compare their details.
+        </Typography>
+
+        <StyledBox
+          sx={{ mb: "20px", minHeight: "200px", flexDirection: "row" }}
+        >
+          {ids.length > 0 && (
+            <>
+              {compareHorses.map((horse: Horse) => (
+                <StyledBox key={horse.id} sx={{ flexBasis: "50%" }}>
+                  <Details horse={horse} />
+                  <Button
+                    variant="outlined"
+                    onClick={() => removeCompare(horse.id)}
+                    sx={{ width: "max-content", alignSelf: "end" }}
+                  >
+                    Remove
+                  </Button>
+                </StyledBox>
+              ))}
+            </>
+          )}
+        </StyledBox>
+      </Container>
+    </>
   );
 }

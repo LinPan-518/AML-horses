@@ -25,7 +25,7 @@ const HorseDetail: React.FC<HorseDetailProps> = ({ horse, onClose }) => {
       <DialogContent
         sx={{
           display: "flex",
-          gap: 2,
+          gap: "20px",
           flexDirection: "column",
           minWidth: "500px",
         }}

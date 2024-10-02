@@ -11,8 +11,8 @@ interface Profile {
 export interface EditHorse {
   name: string;
   favouriteFood: string;
-  weight: number;
-  height: number;
+  weight: number | string;
+  height: number | string;
 };
 
 export interface Horse {

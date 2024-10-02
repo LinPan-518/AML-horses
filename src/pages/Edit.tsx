@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from "react";
-import {
-  TextField,
-  Button,
-  Container,
-  Typography,
-} from "@mui/material";
+import { Typography } from "@mui/material";
 
 import { addHorse, updateHorseById } from "../services/apiServices";
-import { Horse,EditHorse } from "../types/definitions";
+import { Horse, EditHorse } from "../types/definitions";
 import { useNavigate, useParams } from "react-router-dom";
 import { getHorseById } from "../services/apiServices";
-import Loading from "../components/Loading";
+import Loading from "../components/loading/FormSkeleton";
+import HorseForm from "../components/HorseForm";
 
 const initialState: EditHorse = {
   name: "",
   favouriteFood: "",
-  weight: 0,
-  height: 0,
+  weight: "",
+  height: "",
 };
 
 const AddHorseForm: React.FC = () => {
@@ -36,12 +32,14 @@ const AddHorseForm: React.FC = () => {
         try {
           setLoading(true);
           const data: Horse = await getHorseById(id);
-          setCurrentHorse(data.name);
+          setCurrentHorse(data.name);       
+          const { favouriteFood = "", physical = {} } = data?.profile || {};
+          const { weight = "", height = "" } = physical;
           setForm({
-            name: data.name,
-            favouriteFood: data?.profile?.favouriteFood||"",
-            weight: data?.profile?.physical?.weight||0,
-            height: data?.profile?.physical?.height||0,
+            name: data?.name || "",
+            favouriteFood,
+            weight,
+            height,
           });
         } catch (error) {
           console.error("Error fetching horses:", error);
@@ -94,61 +92,28 @@ const AddHorseForm: React.FC = () => {
   }
 
   return (
-    <Container>
-      <Typography variant="h2" gutterBottom>
+    <>
+      <Typography
+        variant="h2"
+        gutterBottom
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          maxWidth: "80%",
+        }}
+      >
         {isAdd ? "Add a New Horse" : `Edit the Horse: ${currentHorse}`}
       </Typography>
       {error && <Typography color="error">{error}</Typography>}
-      <form onSubmit={handleFormSubmit}>
-        <TextField
-          label="Horse Name"
-          fullWidth
-          margin="normal"
-          value={form.name}
-          name={"name"}
-          onChange={handleInput}
-          required
-        />
-        <TextField
-          label="Favourite Food"
-          fullWidth
-          margin="normal"
-          value={form.favouriteFood}
-          name="favouriteFood"
-          onChange={handleInput}
-        />
-        <TextField
-          label="Height (cm)"
-          fullWidth
-          margin="normal"
-          value={form.height}
-          name="height"
-          onChange={handleInput}
-          type="number"
-        />
-
-        <TextField
-          label="Weight (kg)"
-          fullWidth
-          margin="normal"
-          value={form.weight}
-          name="weight"
-          onChange={handleInput}
-          type="number"
-        />
-
-        <Button variant="contained" color="primary" type="submit" sx={{ m: 3 }}>
-          {isAdd ? "Create" : "Save"}
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => navigate("/")}
-        >
-          Cancel
-        </Button>
-      </form>
-    </Container>
+      <HorseForm
+        form={form}
+        formHeader={isAdd ? "Create" : "Save"}
+        onSubmit={handleFormSubmit}
+        onReset={() => navigate("/")}
+        onChange={handleInput}
+      />
+    </>
   );
 };
 

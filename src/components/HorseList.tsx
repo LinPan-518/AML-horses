@@ -25,7 +25,7 @@ export default function HorseList({
   const nevigate = useNavigate();
 
   const handleEditHorse = (id: string) => {
-    nevigate(`/add/${id}`);
+    nevigate(`/horse/${id}`);
   };
   const handleViewDetails = (id: string) => {
     setSelectedId(id);

@@ -30,7 +30,7 @@ describe("Item Component", () => {
 
     // Check if the buttons are rendered
     expect(screen.getByText("Compare")).toBeInTheDocument();
-    expect(screen.getByText("View Details")).toBeInTheDocument();
+    expect(screen.getByText("View")).toBeInTheDocument();
     expect(screen.getByText("Edit")).toBeInTheDocument();
   });
 
@@ -63,7 +63,7 @@ describe("Item Component", () => {
       />
     );
 
-    const viewButton = screen.getByText("View Details");
+    const viewButton = screen.getByText("View");
     fireEvent.click(viewButton);
 
     // Ensure the view function is called with the correct id

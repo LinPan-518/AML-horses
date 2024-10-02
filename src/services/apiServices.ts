@@ -7,38 +7,51 @@ const apiClient = axios.create({
   baseURL: API_BASE,
 });
 
-apiClient.interceptors.response.use(
-  (response) => {
-    return response;
+apiClient.interceptors.request.use(
+  (config) => {
+    if (config.method === 'put' || config.method === 'post') {
+      config.headers['Content-Type'] = 'application/json';
+      if (config.data && typeof config.data === 'object') {
+        config.data = JSON.stringify(config.data);
+      }
+    }
+    return config;
   },
   (error) => {
-    // Handle errors globally
+    return Promise.reject(error);
+  }
+);
+
+// Global error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
     if (error.response) {
       console.error("API error:", error.response.data);
       if (error.response.status === 401) {
-        alert('Unauthorized! Redirecting to login...');
+        alert("Unauthorized! Redirecting to login...");
         // window.location.href = '/login';
       }
+      //...
     }
     return Promise.reject(error);
   }
 );
 
-export const getHorses = async () => {
-  const response = await axios.get(API_BASE);
+// Generic GET method
+const getRequest = async (url: string) => {
+  const response = await apiClient.get(url);
   return response.data;
 };
 
-export const getHorseById = async (id: string) => {
-  const response = await axios.get(`${API_BASE}/${id}`);
-  return response.data;
-};
-export const addHorse = async (horse: Omit<Horse, "id">) => {
-  const response = await axios.put(API_BASE, horse);
+// Generic PUT method
+const putRequest = async (url: string, data: any) => {
+  const response = await apiClient.put(url, data);
   return response.data;
 };
 
-export const updateHorseById = async (id: string, horse: Omit<Horse, "id">) => {
-  const response = await axios.put(`${API_BASE}/${id}`, horse);
-  return response.data;
-};
+// Exported API functions
+export const getHorses = () => getRequest("");
+export const getHorseById = (id: string) => getRequest(`/${id}`);
+export const addHorse = (horse: Omit<Horse, "id">) => putRequest("", horse);
+export const updateHorseById = (id: string, horse: Omit<Horse, "id">) => putRequest(`/${id}`, horse);

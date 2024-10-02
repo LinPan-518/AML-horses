@@ -1,7 +1,7 @@
 import { Button, ListItem, ListItemText } from "@mui/material";
 import { Horse } from "../types/definitions";
 
-const Item =({
+const Item = ({
   horse,
   view,
   edit,
@@ -13,16 +13,16 @@ const Item =({
   edit: (id: string) => void;
   compare: (id: string) => void;
   ids: string[];
-})=> {
+}) => {
   return (
     <>
       <ListItem>
-        <ListItemText primary={horse.name} />
+        <ListItemText primary={horse.name} sx={{ width: "70%" }} />
         <Button
           variant="outlined"
-          color="primary"
+          color="secondary"
           onClick={() => compare(horse.id)}
-          disabled={ids.includes(horse.id)}
+          disabled={ids.includes(horse.id) || ids.length >= 2}
         >
           Compare
         </Button>
@@ -32,7 +32,7 @@ const Item =({
           sx={{ ml: 2, mr: 2 }}
           onClick={() => view(horse.id)}
         >
-          View Details
+          View
         </Button>
         <Button
           variant="contained"
