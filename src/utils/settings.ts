@@ -1,0 +1,1 @@
+export const ITME_PRE_PAGE = 10;
